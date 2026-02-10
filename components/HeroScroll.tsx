@@ -1,6 +1,7 @@
 "use client";
 
-import { useRef, useEffect, useCallback } from "react";
+import { useRef, useEffect, useCallback, useState } from "react";
+import Image from "next/image";
 import { useImagePreloader } from "@/hooks/useImagePreloader";
 import { useLenisScroll } from "@/contexts/LenisScrollContext";
 import { useRegistrationModal } from "@/contexts/RegistrationModalContext";
@@ -9,6 +10,8 @@ import { motion, useScroll, useTransform } from "framer-motion";
 const HERO_HEIGHT_VH = 120;
 const FRAME_LERP = 0.12;
 const HERO_EASE = [0.22, 1, 0.36, 1] as const;
+/** Minimum time (ms) the preloader is visible before fade-out. */
+const PRELOADER_MIN_DISPLAY_MS = 1400;
 
 function BlurRevealText({
   text,
@@ -48,11 +51,33 @@ function BlurRevealText({
 export function HeroScroll() {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const { images, isReady, totalFrames, error } = useImagePreloader();
+  const {
+    imagesRef,
+    maxLoadedIndexRef,
+    isReady,
+    totalFrames,
+    error,
+  } = useImagePreloader();
   const { scrollYRef } = useLenisScroll();
   const { openModal } = useRegistrationModal();
   const currentFrameRef = useRef(0);
   const targetFrameRef = useRef(0);
+  const [preloaderExiting, setPreloaderExiting] = useState(false);
+  const preloaderShownAtRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (preloaderShownAtRef.current === null) preloaderShownAtRef.current = Date.now();
+  }, []);
+
+  useEffect(() => {
+    if (!isReady || preloaderExiting) return;
+    const elapsed = preloaderShownAtRef.current
+      ? Date.now() - preloaderShownAtRef.current
+      : 0;
+    const delay = Math.max(0, PRELOADER_MIN_DISPLAY_MS - elapsed);
+    const t = setTimeout(() => setPreloaderExiting(true), delay);
+    return () => clearTimeout(t);
+  }, [isReady, preloaderExiting]);
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -62,22 +87,31 @@ export function HeroScroll() {
 
   const draw = useCallback(
     (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, index: number) => {
-      const img = images[index];
+      const maxLoaded = maxLoadedIndexRef.current;
+      const imgs = imagesRef.current;
+      const safeIndex =
+        maxLoaded >= 0 && imgs.length > 0 ? Math.min(index, maxLoaded) : 0;
+      const img = imgs[safeIndex];
       if (!img) return;
-      const scale = Math.max(canvas.width / img.width, canvas.height / img.height);
+      const scale = Math.max(
+        canvas.width / img.width,
+        canvas.height / img.height
+      );
       const w = img.width * scale;
       const h = img.height * scale;
       const x = (canvas.width - w) / 2;
       const y = (canvas.height - h) / 2;
       ctx.drawImage(img, x, y, w, h);
     },
-    [images]
+    // Refs are stable; we read .current inside to avoid re-running canvas effect on every frame load.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
   );
 
   useEffect(() => {
     const container = containerRef.current;
     const canvas = canvasRef.current;
-    if (!container || !canvas || !isReady || images.length === 0 || totalFrames === 0) return;
+    if (!container || !canvas || !isReady || totalFrames === 0) return;
 
     const ctx = canvas.getContext("2d", { alpha: false });
     if (!ctx) return;
@@ -106,8 +140,14 @@ export function HeroScroll() {
       const sectionHeight = container.offsetHeight;
       const viewportHeight = window.innerHeight;
       const maxScroll = Math.max(0, sectionHeight - viewportHeight);
-      const progress = maxScroll <= 0 ? 0 : Math.max(0, Math.min(1, (scrollY - sectionTop) / maxScroll));
-      targetFrameRef.current = Math.min(Math.floor(progress * totalFrames), totalFrames - 1);
+      const scrollProgress =
+        maxScroll <= 0
+          ? 0
+          : Math.max(0, Math.min(1, (scrollY - sectionTop) / maxScroll));
+      targetFrameRef.current = Math.min(
+        Math.floor(scrollProgress * totalFrames),
+        totalFrames - 1
+      );
 
       const target = targetFrameRef.current;
       let current = currentFrameRef.current;
@@ -126,7 +166,7 @@ export function HeroScroll() {
       resizeObserver.disconnect();
       cancelAnimationFrame(rafId);
     };
-  }, [isReady, images.length, totalFrames, draw, scrollYRef]);
+  }, [isReady, totalFrames, draw, scrollYRef]);
 
   return (
     <div
@@ -138,7 +178,11 @@ export function HeroScroll() {
         <canvas
           ref={canvasRef}
           className="absolute inset-0 w-full h-full object-cover will-change-transform"
-          style={{ display: isReady ? "block" : "none", touchAction: "none" }}
+          style={{
+            display: isReady ? "block" : "none",
+            touchAction: "none",
+          }}
+          aria-hidden="true"
         />
         {/* Smooth fade at bottom of last frame into next section */}
         {isReady && (
@@ -155,12 +199,30 @@ export function HeroScroll() {
             <p className="font-inter font-medium text-red-400 text-sm tracking-wide text-center px-4">{error}</p>
           </div>
         )}
-        {!isReady && !error && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm">
-            <p className="font-inter font-medium text-white/90 text-sm tracking-wide">
-              Loading…
-            </p>
-          </div>
+        {(!isReady || preloaderExiting) && !error && (
+          <motion.div
+            className="absolute inset-0 flex flex-col items-center justify-center bg-black"
+            role="status"
+            aria-live="polite"
+            aria-busy={!isReady}
+            aria-label="Loading"
+            initial={false}
+            animate={{ opacity: preloaderExiting ? 0 : 1 }}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            onAnimationComplete={() => {
+              if (preloaderExiting) setPreloaderExiting(false);
+            }}
+          >
+            <Image
+              src="/Logo.svg"
+              alt=""
+              width={160}
+              height={64}
+              className="h-12 w-auto sm:h-14 md:h-16 select-none"
+              priority
+              draggable={false}
+            />
+          </motion.div>
         )}
         {isReady && (
           <div className="absolute inset-0 flex flex-col items-center justify-center min-h-dvh px-4 sm:px-6 md:px-8">
