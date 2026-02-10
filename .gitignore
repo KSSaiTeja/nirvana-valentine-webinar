@@ -33,6 +33,10 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# Google Cloud / Firebase credentials (never commit)
+**/*-fb0d8ccd50b7.json
+**/nirvana-valentines-day-*.json
+
 # vercel
 .vercel
 
