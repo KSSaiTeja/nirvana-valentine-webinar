@@ -37,7 +37,7 @@ export function WebinarDetailsSection() {
 
   return (
     <section
-      id="register"
+      id="details"
       ref={ref}
       className="relative w-full py-16 sm:py-20 md:py-24 lg:py-28 overflow-hidden bg-neutral-50/80"
     >

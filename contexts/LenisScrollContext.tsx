@@ -2,8 +2,15 @@
 
 import { createContext, useContext, useMemo, type ReactNode } from "react";
 
+export type ScrollToOptions = {
+  offset?: number;
+  duration?: number;
+};
+
 type LenisScrollContextValue = {
   scrollYRef: React.MutableRefObject<number>;
+  /** Smooth-scroll to a CSS selector (e.g. "#details"). Use for anchor links so Lenis handles scroll. */
+  scrollTo: (selector: string, options?: ScrollToOptions) => void;
 };
 
 const LenisScrollContext = createContext<LenisScrollContextValue | null>(null);
@@ -16,12 +23,14 @@ export function useLenisScroll() {
 
 export function LenisScrollProvider({
   scrollYRef,
+  scrollTo,
   children,
 }: {
   scrollYRef: React.MutableRefObject<number>;
+  scrollTo: (selector: string, options?: ScrollToOptions) => void;
   children: ReactNode;
 }) {
-  const value = useMemo(() => ({ scrollYRef }), [scrollYRef]);
+  const value = useMemo(() => ({ scrollYRef, scrollTo }), [scrollYRef, scrollTo]);
   return (
     <LenisScrollContext.Provider value={value}>
       {children}

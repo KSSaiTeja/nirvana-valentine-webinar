@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import Lenis from "lenis";
 import { LenisScrollProvider } from "@/contexts/LenisScrollContext";
 import "lenis/dist/lenis.css";
@@ -9,6 +9,16 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
   const rafRef = useRef<number>(0);
   const lenisRef = useRef<Lenis | null>(null);
   const scrollYRef = useRef(0);
+
+  const scrollTo = useCallback((selector: string, options?: { offset?: number; duration?: number }) => {
+    const el = document.querySelector(selector);
+    if (el && lenisRef.current) {
+      lenisRef.current.scrollTo(el as HTMLElement, {
+        offset: options?.offset ?? 0,
+        duration: options?.duration ?? 1.2,
+      });
+    }
+  }, []);
 
   useEffect(() => {
     const lenis = new Lenis({
@@ -43,7 +53,7 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <LenisScrollProvider scrollYRef={scrollYRef}>
+    <LenisScrollProvider scrollYRef={scrollYRef} scrollTo={scrollTo}>
       {children}
     </LenisScrollProvider>
   );

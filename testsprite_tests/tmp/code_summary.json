@@ -1,0 +1,83 @@
+{
+  "tech_stack": [
+    "TypeScript",
+    "React 19",
+    "Next.js 16 (App Router)",
+    "Tailwind CSS",
+    "Framer Motion",
+    "Lenis (smooth scroll)",
+    "Google Sheets API (registration backend)"
+  ],
+  "features": [
+    {
+      "name": "Home page",
+      "description": "Main landing page composing hero, sections, and footer",
+      "files": ["app/page.tsx", "app/layout.tsx", "app/globals.css"]
+    },
+    {
+      "name": "Hero scroll / image sequence",
+      "description": "Scroll-driven hero with canvas image sequence, headline, CTAs, and scroll-to-details",
+      "files": ["components/HeroScroll.tsx", "hooks/useImagePreloader.ts"]
+    },
+    {
+      "name": "Preloader",
+      "description": "Black screen with logo; fades out when content is ready (min ~1.4s)",
+      "files": ["components/HeroScroll.tsx", "hooks/useImagePreloader.ts"]
+    },
+    {
+      "name": "Smooth scroll",
+      "description": "Lenis-based smooth scrolling and scroll context",
+      "files": ["components/SmoothScroll.tsx", "contexts/LenisScrollContext.tsx"]
+    },
+    {
+      "name": "Header",
+      "description": "Sticky header with logo and Reserve my seat CTA",
+      "files": ["components/Header.tsx"]
+    },
+    {
+      "name": "Not for section",
+      "description": "Section describing who the webinar is not for",
+      "files": ["components/NotForSection.tsx"]
+    },
+    {
+      "name": "Why this matters section",
+      "description": "Value proposition section",
+      "files": ["components/WhyThisMattersSection.tsx"]
+    },
+    {
+      "name": "In 90 minutes section",
+      "description": "What attendees will learn in 90 minutes",
+      "files": ["components/In90MinutesSection.tsx"]
+    },
+    {
+      "name": "Webinar details section",
+      "description": "Date, time, format, price and Reserve my seat CTA",
+      "files": ["components/WebinarDetailsSection.tsx"]
+    },
+    {
+      "name": "Footer",
+      "description": "Links and branding",
+      "files": ["components/Footer.tsx"]
+    },
+    {
+      "name": "Registration modal and flow",
+      "description": "Modal with name, email, phone form; submit to /api/register; success/error states",
+      "files": ["contexts/RegistrationModalContext.tsx", "components/Header.tsx", "components/HeroScroll.tsx", "components/WebinarDetailsSection.tsx"]
+    },
+    {
+      "name": "Registration API",
+      "description": "POST /api/register validates and appends registrations to Google Sheet",
+      "files": ["app/api/register/route.ts"]
+    },
+    {
+      "name": "Sequence API",
+      "description": "GET /api/sequence returns sorted list of hero image URLs from public folder",
+      "files": ["app/api/sequence/route.ts"]
+    },
+    {
+      "name": "Image preloader hook",
+      "description": "Loads hero sequence images with concurrency, progress, and early-ready state",
+      "files": ["hooks/useImagePreloader.ts"]
+    }
+  ]
+}

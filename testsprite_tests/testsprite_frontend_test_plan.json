@@ -1,0 +1,477 @@
+[
+  {
+    "id": "TC001",
+    "title": "Preloader minimum display and fade out behavior",
+    "description": "Verify that the preloader black screen with logo is displayed for at least 1.4 seconds and fades out only after the hero content is fully loaded.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Load the webinar landing page"
+      },
+      {
+        "type": "assertion",
+        "description": "Check that the preloader screen with logo is visible immediately on load"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify that the preloader stays visible for at least 1.4 seconds"
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm that preloader only fades out after all hero content including images are fully loaded"
+      },
+      {
+        "type": "assertion",
+        "description": "Validate that after fade out, the hero section is visible and interactive"
+      }
+    ]
+  },
+  {
+    "id": "TC002",
+    "title": "Hero section scroll-driven image sequence animation",
+    "description": "Validate that the scroll-driven canvas image sequence animates smoothly and the images are rendered in the correct order as user scrolls.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Load the landing page and wait for preloader to disappear"
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm hero image sequence starts with first image correctly rendered"
+      },
+      {
+        "type": "action",
+        "description": "Scroll down slowly through the hero section"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify that hero images update sequentially with scroll position without jank or frame drops"
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm images are displayed in correct order as per API sequence URLs"
+      },
+      {
+        "type": "action",
+        "description": "Scroll back up and verify reverse image sequence animation correctness"
+      }
+    ]
+  },
+  {
+    "id": "TC003",
+    "title": "Hero 'Reserve my seat' CTA opens registration modal",
+    "description": "Check that clicking the 'Reserve my seat' button in the hero section opens the registration modal reliably.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Load the page and wait for preloader fade out"
+      },
+      {
+        "type": "action",
+        "description": "Click on the hero's 'Reserve my seat' CTA button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify that the registration modal is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Check mandatory form fields (name, email, phone) are present and empty initially"
+      }
+    ]
+  },
+  {
+    "id": "TC004",
+    "title": "Header sticky behavior and CTA functionality",
+    "description": "Confirm that the sticky header remains visible and functional during page scroll and its 'Reserve my seat' CTA opens the registration modal.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Load the page and scroll down partially"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the header remains sticky and visible at top of viewport"
+      },
+      {
+        "type": "action",
+        "description": "Click on the 'Reserve my seat' button in the header"
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm that the registration modal opens"
+      }
+    ]
+  },
+  {
+    "id": "TC005",
+    "title": "Scroll to details CTA smooth scrolling",
+    "description": "Check that clicking the 'Scroll to know more' CTA in the hero smoothly scrolls the page to the informative sections.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Load the page"
+      },
+      {
+        "type": "action",
+        "description": "Click the 'Scroll to know more' CTA in the hero section"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify that the page scrolls smoothly to the detailed informational sections"
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm that scrolling behavior uses Lenis smooth scroll without jank"
+      }
+    ]
+  },
+  {
+    "id": "TC006",
+    "title": "Registration modal form field validation",
+    "description": "Validate client-side form validation for registration modal fields: name (non-empty), email (proper format), phone (numerical and length).",
+    "category": "error handling",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Open the registration modal"
+      },
+      {
+        "type": "action",
+        "description": "Submit the form with all fields empty"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify required field validation messages appear for all fields"
+      },
+      {
+        "type": "action",
+        "description": "Enter invalid email format in email field and valid input for others"
+      },
+      {
+        "type": "action",
+        "description": "Submit the form"
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm email format validation error is displayed"
+      },
+      {
+        "type": "action",
+        "description": "Enter phone with alphabets or less than required digits and valid input for others"
+      },
+      {
+        "type": "action",
+        "description": "Submit the form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify phone field validation error is shown"
+      }
+    ]
+  },
+  {
+    "id": "TC007",
+    "title": "Successful registration submission flow",
+    "description": "Test that submitting valid registration data results in successful submission to backend API, modal displays success message and clears form fields.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Open the registration modal"
+      },
+      {
+        "type": "action",
+        "description": "Fill form with valid name, valid email, valid phone number"
+      },
+      {
+        "type": "action",
+        "description": "Submit the registration form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a success message or thank-you message is displayed in the modal"
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm form inputs are cleared or modal resets appropriately after success"
+      }
+    ]
+  },
+  {
+    "id": "TC008",
+    "title": "Registration submission error handling",
+    "description": "Verify that if the backend API returns error or is unreachable, an error message is shown in the registration modal.",
+    "category": "error handling",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Open registration modal"
+      },
+      {
+        "type": "action",
+        "description": "Fill form with valid data"
+      },
+      {
+        "type": "action",
+        "description": "Simulate backend API failure or return an error response"
+      },
+      {
+        "type": "action",
+        "description": "Submit the registration form"
+      },
+      {
+        "type": "assertion",
+        "description": "Check that a descriptive error message is displayed within the modal"
+      },
+      {
+        "type": "assertion",
+        "description": "Ensure that the form remains with user data for correction or retry"
+      }
+    ]
+  },
+  {
+    "id": "TC009",
+    "title": "Registration backend API request validation and data appending",
+    "description": "Test that the backend API POST /api/register validates incoming data fields properly and appends valid data to Google Sheets.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Send POST request to /api/register with missing fields"
+      },
+      {
+        "type": "assertion",
+        "description": "API returns validation error with appropriate HTTP status code"
+      },
+      {
+        "type": "action",
+        "description": "Send POST request with malformed email or phone"
+      },
+      {
+        "type": "assertion",
+        "description": "API returns validation error argument details"
+      },
+      {
+        "type": "action",
+        "description": "Send POST request with valid registration data"
+      },
+      {
+        "type": "assertion",
+        "description": "API responds with success status"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify that the registration data is appended correctly to Google Sheets"
+      }
+    ]
+  },
+  {
+    "id": "TC010",
+    "title": "Hero image sequence URLs API correctness",
+    "description": "Validate that GET /api/sequence endpoint returns a correctly ordered list of hero image URLs from the public folder.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Send GET request to /api/sequence"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the response status is success"
+      },
+      {
+        "type": "assertion",
+        "description": "Check that the response contains an array of URLs"
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm URLs are sorted in the intended order for animation sequence"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the URLs point to existing images accessible publicly"
+      }
+    ]
+  },
+  {
+    "id": "TC011",
+    "title": "Image preloader hook image loading and progress tracking",
+    "description": "Test the custom image preloader hook handles concurrent loading of hero images, reports accurate progress, and triggers early-ready state appropriately.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Initialize image preloader with hero image URLs"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify multiple images are loaded concurrently for efficiency"
+      },
+      {
+        "type": "assertion",
+        "description": "Check progress updates correspond correctly to images loaded vs total"
+      },
+      {
+        "type": "action",
+        "description": "Simulate delayed image load for some images"
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm early-ready state triggers when threshold number of images are loaded prior to full completion"
+      }
+    ]
+  },
+  {
+    "id": "TC012",
+    "title": "Responsive layout across device types",
+    "description": "Ensure the landing page layout including hero, informational sections, sticky header, registration modal, and footer adapt correctly for desktop, tablet, and mobile viewport sizes.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Load landing page on desktop viewport"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify all sections are visible, content is readable, and styling is consistent"
+      },
+      {
+        "type": "action",
+        "description": "Resize or emulate tablet viewport"
+      },
+      {
+        "type": "assertion",
+        "description": "Validate responsive adjustments are correct with no layout breakage"
+      },
+      {
+        "type": "action",
+        "description": "Resize or emulate mobile viewport"
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm content stack, font size, button sizes are optimized for mobile usability"
+      },
+      {
+        "type": "action",
+        "description": "Open registration modal on each viewport"
+      },
+      {
+        "type": "assertion",
+        "description": "Check modal form fields and buttons are usable and not clipped at all viewport sizes"
+      }
+    ]
+  },
+  {
+    "id": "TC013",
+    "title": "Sticky footer branding and external links correctness",
+    "description": "Verify that the footer displays correct branding, includes all relevant external resource links, and links are functional.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Load landing page"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify footer is visible at page bottom"
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm branding elements (logo, text) are displayed as specified"
+      },
+      {
+        "type": "assertion",
+        "description": "Check presence of each external link described in PRD"
+      },
+      {
+        "type": "action",
+        "description": "Click each external link to verify URL opens correctly in a new tab or as specified"
+      }
+    ]
+  },
+  {
+    "id": "TC014",
+    "title": "Verify accessibility of registration modal and form",
+    "description": "Confirm the registration modal supports keyboard navigation, focus is managed properly, and form fields have accessible labels.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Open registration modal"
+      },
+      {
+        "type": "action",
+        "description": "Use keyboard (Tab key) to navigate through modal elements"
+      },
+      {
+        "type": "assertion",
+        "description": "Ensure focus cycles through all interactive form fields and buttons in logical order"
+      },
+      {
+        "type": "assertion",
+        "description": "Check each form input has associated accessible labels"
+      },
+      {
+        "type": "action",
+        "description": "Press Escape key while modal is open"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify modal closes and focus returns to element that triggered modal opening"
+      }
+    ]
+  },
+  {
+    "id": "TC015",
+    "title": "Scroll behavior with Lenis smooth scrolling",
+    "description": "Validate that all scroll interactions including page scroll, jump to sections from CTAs, and back to top behave smoothly using Lenis without jank.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Load page and scroll manually via mouse wheel or touchpad"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify scrolling is smooth with no abrupt jumps or jank"
+      },
+      {
+        "type": "action",
+        "description": "Click 'Scroll to know more' CTA and observe scrolling behavior"
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm scroll animation is smooth and targets correct section"
+      },
+      {
+        "type": "action",
+        "description": "Use header navigation or other UI that triggers scroll jumps"
+      },
+      {
+        "type": "assertion",
+        "description": "Validate smooth and predictable scroll transitions"
+      }
+    ]
+  }
+]

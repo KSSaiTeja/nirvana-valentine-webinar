@@ -1,0 +1,19 @@
+{
+  "status": "commited",
+  "type": "frontend",
+  "scope": "codebase",
+  "localEndpoint": "http://localhost:3000",
+  "loginUser": "saitej",
+  "loginPassword": "Saitej@8262",
+  "executionArgs": {
+    "projectName": "nirvana-valentine-webinar",
+    "projectPath": "/Users/kssaiteja/Downloads/nirvana-valentine-webinar",
+    "testIds": [],
+    "additionalInstruction": "",
+    "envs": {
+      "API_KEY": "sk-user-PtFhvGZFpnY-JBNueyOoU2J7Y2FqZjCUKyVe714N2VWdsLNFpmtzIbOB8YubvtMWFuDfvgsj5ltnCthlvI6C4fGCzeMRyf8I1gtPiSvSIhCv4zpGlR4mlZAqdroIRS0eqPQ"
+    }
+  },
+  "serverPort": 65475,
+  "proxy": "http://bf768a9c-8d88-43d0-a0dd-ba93d9c2f4ae:opHScpKbdMzQocSXhnkQiEReox99IDIL@tun.testsprite.com:8080"
+}

@@ -1,0 +1,171 @@
+{
+  "meta": {
+    "project": "Nirvana Valentine Webinar Landing Page",
+    "date": "2026-02-10",
+    "prepared_by": "Software Development Manager"
+  },
+  "product_overview": "Single-page marketing site for a live webinar on Feb 14, 2026, designed to inform users about the webinar details and drive registrations at ₹499 (inclusive of GST). The product features an engaging scroll-driven hero, clear value proposition sections, and a streamlined registration flow.",
+  "core_goals": [
+    "Provide a visually engaging landing page that clearly communicates the webinar's value and details.",
+    "Drive user registrations for the webinar through an intuitive and accessible registration modal.",
+    "Ensure smooth and responsive user experience across all devices, including smooth scrolling and interactive hero animations.",
+    "Maintain consistent branding and easy navigation with a sticky header and footer.",
+    "Validate and securely handle registration data, integrating with a backend Google Sheets API."
+  ],
+  "key_features": [
+    "Hero section with scroll-driven canvas image sequence, headline, subtext, and dual CTAs ('Reserve my seat' and 'Scroll to know more').",
+    "Preloader displaying a black screen with logo that fades out after content readiness with a minimum display time of ~1.4 seconds.",
+    "Multiple informational sections including 'Not for', 'Why this matters', 'In 90 minutes', 'Webinar details' with date, time, format, price, and CTA.",
+    "Sticky header with branding and 'Reserve my seat' CTA that opens the registration modal.",
+    "Footer with branding and relevant external links.",
+    "Registration modal featuring form fields for name, email, and phone with submission to an API endpoint and appropriate success and error state handling.",
+    "Smooth scrolling implemented via Lenis for enhanced user experience.",
+    "Backend API to handle registration POST requests, validating inputs and appending data to a Google Sheet.",
+    "API to serve the hero image sequence URLs for preloading and animation.",
+    "Image preloader hook managing concurrent loading, progress tracking, and early-ready state for the hero images."
+  ],
+  "user_flow_summary": [
+    "User lands on the home page and first sees a preloader screen with logo.",
+    "Once content is ready, the preloader fades out revealing the hero section with an interactive scroll-driven image sequence, headline, subtext, and two CTAs.",
+    "User can click 'Reserve my seat' in the hero or header or webinar details to open the registration modal.",
+    "User completes the registration form (name, email, phone) and submits.",
+    "On successful submission, user sees a thank-you or success message; on error, user is shown the error within the modal.",
+    "User can scroll down to explore additional sections: 'Not for', 'Why this matters', 'In 90 minutes', 'Webinar details'.",
+    "Scroll interactions include smooth scrolling and jump to details from the secondary CTA in hero.",
+    "Sticky header remains visible for easy navigation and quick access to registration.",
+    "Footer provides branding and external resources."
+  ],
+  "validation_criteria": [
+    "All hero images load and animate correctly with smooth scroll on supported devices.",
+    "Preloader screen displays for at least 1.4 seconds and fades out only after content is fully loaded.",
+    "All 'Reserve my seat' CTAs open the registration modal reliably.",
+    "Scroll-to-details CTA scrolls smoothly to the detailed sections.",
+    "Registration form validates inputs and submits data to the backend API endpoint.",
+    "Success and error states after registration submission display correctly in the modal.",
+    "Sticky header remains visible and functional during scrolling.",
+    "Layout is responsive across desktop, tablet, and mobile viewport sizes.",
+    "Footer displays correct links and branding as specified.",
+    "Backend API successfully validates and appends registration data to Google Sheets.",
+    "Hero image URLs API returns correct ordered list for preloading and animation.",
+    "Image preloader handles concurrency and reports progress with early-ready state handling."
+  ],
+  "code_summary": {
+    "tech_stack": [
+      "TypeScript",
+      "React 19",
+      "Next.js 16 (App Router)",
+      "Tailwind CSS",
+      "Framer Motion",
+      "Lenis (smooth scroll)",
+      "Google Sheets API (registration backend)"
+    ],
+    "features": [
+      {
+        "name": "Home page",
+        "description": "Main landing page composing hero, sections, and footer",
+        "files": [
+          "app/page.tsx",
+          "app/layout.tsx",
+          "app/globals.css"
+        ]
+      },
+      {
+        "name": "Hero scroll / image sequence",
+        "description": "Scroll-driven hero with canvas image sequence, headline, CTAs, and scroll-to-details",
+        "files": [
+          "components/HeroScroll.tsx",
+          "hooks/useImagePreloader.ts"
+        ]
+      },
+      {
+        "name": "Preloader",
+        "description": "Black screen with logo; fades out when content is ready (min ~1.4s)",
+        "files": [
+          "components/HeroScroll.tsx",
+          "hooks/useImagePreloader.ts"
+        ]
+      },
+      {
+        "name": "Smooth scroll",
+        "description": "Lenis-based smooth scrolling and scroll context",
+        "files": [
+          "components/SmoothScroll.tsx",
+          "contexts/LenisScrollContext.tsx"
+        ]
+      },
+      {
+        "name": "Header",
+        "description": "Sticky header with logo and Reserve my seat CTA",
+        "files": [
+          "components/Header.tsx"
+        ]
+      },
+      {
+        "name": "Not for section",
+        "description": "Section describing who the webinar is not for",
+        "files": [
+          "components/NotForSection.tsx"
+        ]
+      },
+      {
+        "name": "Why this matters section",
+        "description": "Value proposition section",
+        "files": [
+          "components/WhyThisMattersSection.tsx"
+        ]
+      },
+      {
+        "name": "In 90 minutes section",
+        "description": "What attendees will learn in 90 minutes",
+        "files": [
+          "components/In90MinutesSection.tsx"
+        ]
+      },
+      {
+        "name": "Webinar details section",
+        "description": "Date, time, format, price and Reserve my seat CTA",
+        "files": [
+          "components/WebinarDetailsSection.tsx"
+        ]
+      },
+      {
+        "name": "Footer",
+        "description": "Links and branding",
+        "files": [
+          "components/Footer.tsx"
+        ]
+      },
+      {
+        "name": "Registration modal and flow",
+        "description": "Modal with name, email, phone form; submit to /api/register; success/error states",
+        "files": [
+          "contexts/RegistrationModalContext.tsx",
+          "components/Header.tsx",
+          "components/HeroScroll.tsx",
+          "components/WebinarDetailsSection.tsx"
+        ]
+      },
+      {
+        "name": "Registration API",
+        "description": "POST /api/register validates and appends registrations to Google Sheet",
+        "files": [
+          "app/api/register/route.ts"
+        ]
+      },
+      {
+        "name": "Sequence API",
+        "description": "GET /api/sequence returns sorted list of hero image URLs from public folder",
+        "files": [
+          "app/api/sequence/route.ts"
+        ]
+      },
+      {
+        "name": "Image preloader hook",
+        "description": "Loads hero sequence images with concurrency, progress, and early-ready state",
+        "files": [
+          "hooks/useImagePreloader.ts"
+        ]
+      }
+    ]
+  }
+}

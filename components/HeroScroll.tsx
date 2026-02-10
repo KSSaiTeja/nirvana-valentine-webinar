@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useImagePreloader } from "@/hooks/useImagePreloader";
 import { useLenisScroll } from "@/contexts/LenisScrollContext";
 import { useRegistrationModal } from "@/contexts/RegistrationModalContext";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 
 const HERO_HEIGHT_VH = 120;
 const FRAME_LERP = 0.12;
@@ -48,9 +48,17 @@ function BlurRevealText({
   );
 }
 
+/** Scroll progress 0..0.2 maps to opacity 1..0 (scroll button fades out). */
+function scrollProgressToButtonOpacity(progress: number): number {
+  if (progress <= 0) return 1;
+  if (progress >= 0.2) return 0;
+  return 1 - progress / 0.2;
+}
+
 export function HeroScroll() {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const scrollButtonRef = useRef<HTMLDivElement>(null);
   const {
     imagesRef,
     maxLoadedIndexRef,
@@ -58,7 +66,7 @@ export function HeroScroll() {
     totalFrames,
     error,
   } = useImagePreloader();
-  const { scrollYRef } = useLenisScroll();
+  const { scrollYRef, scrollTo } = useLenisScroll();
   const { openModal } = useRegistrationModal();
   const currentFrameRef = useRef(0);
   const targetFrameRef = useRef(0);
@@ -78,12 +86,6 @@ export function HeroScroll() {
     const t = setTimeout(() => setPreloaderExiting(true), delay);
     return () => clearTimeout(t);
   }, [isReady, preloaderExiting]);
-
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end start"],
-  });
-  const scrollButtonOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
 
   const draw = useCallback(
     (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, index: number) => {
@@ -111,12 +113,21 @@ export function HeroScroll() {
   useEffect(() => {
     const container = containerRef.current;
     const canvas = canvasRef.current;
+    const scrollButtonEl = scrollButtonRef.current;
     if (!container || !canvas || !isReady || totalFrames === 0) return;
 
     const ctx = canvas.getContext("2d", { alpha: false });
     if (!ctx) return;
 
     const dpr = Math.min(window.devicePixelRatio ?? 1, 2);
+    const sectionLayoutRef = { top: 0, height: 0, maxScroll: 0 };
+
+    const updateSectionLayout = () => {
+      sectionLayoutRef.top = container.offsetTop;
+      sectionLayoutRef.height = container.offsetHeight;
+      const viewportHeight = window.innerHeight;
+      sectionLayoutRef.maxScroll = Math.max(0, sectionLayoutRef.height - viewportHeight);
+    };
 
     const setSize = () => {
       const width = window.innerWidth;
@@ -127,6 +138,7 @@ export function HeroScroll() {
       canvas.height = h;
       canvas.style.width = `${width}px`;
       canvas.style.height = `${height}px`;
+      updateSectionLayout();
       draw(ctx, canvas, Math.round(currentFrameRef.current));
     };
 
@@ -134,12 +146,11 @@ export function HeroScroll() {
     const resizeObserver = new ResizeObserver(() => setSize());
     resizeObserver.observe(container);
 
+    let rafActive = true;
     const update = () => {
+      if (!rafActive) return;
       const scrollY = scrollYRef.current;
-      const sectionTop = container.offsetTop;
-      const sectionHeight = container.offsetHeight;
-      const viewportHeight = window.innerHeight;
-      const maxScroll = Math.max(0, sectionHeight - viewportHeight);
+      const { top: sectionTop, maxScroll } = sectionLayoutRef;
       const scrollProgress =
         maxScroll <= 0
           ? 0
@@ -155,14 +166,38 @@ export function HeroScroll() {
       if (Math.abs(target - current) < 0.5) current = target;
       currentFrameRef.current = current;
       draw(ctx, canvas, Math.round(current));
+
+      if (scrollButtonEl) {
+        scrollButtonEl.style.opacity = String(scrollProgressToButtonOpacity(scrollProgress));
+      }
     };
 
-    let rafId = requestAnimationFrame(function loop() {
-      update();
+    const io = new IntersectionObserver(
+      (entries) => {
+        const [e] = entries;
+        if (!e) return;
+        rafActive = e.isIntersecting;
+        if (rafActive) {
+          updateSectionLayout();
+          update();
+        }
+      },
+      { root: null, rootMargin: "0px", threshold: 0 }
+    );
+    io.observe(container);
+
+    let rafId = 0;
+    function loop() {
+      if (rafActive) {
+        update();
+      }
       rafId = requestAnimationFrame(loop);
-    });
+    }
+    rafId = requestAnimationFrame(loop);
 
     return () => {
+      rafActive = false;
+      io.disconnect();
       resizeObserver.disconnect();
       cancelAnimationFrame(rafId);
     };
@@ -173,6 +208,8 @@ export function HeroScroll() {
       ref={containerRef}
       className="relative w-full"
       style={{ height: `${HERO_HEIGHT_VH}vh` }}
+      data-hero-section="true"
+      data-frame-count={isReady ? totalFrames : undefined}
     >
       <div className="sticky top-0 left-0 w-full h-dvh min-h-dvh max-h-dvh flex items-center justify-center overflow-hidden">
         <canvas
@@ -183,6 +220,8 @@ export function HeroScroll() {
             touchAction: "none",
           }}
           aria-hidden="true"
+          data-testid="hero-canvas"
+          data-hero-sequence="true"
         />
         {/* Smooth fade at bottom of last frame into next section */}
         {isReady && (
@@ -206,6 +245,8 @@ export function HeroScroll() {
             aria-live="polite"
             aria-busy={!isReady}
             aria-label="Loading"
+            data-testid="preloader"
+            data-preloader-min-ms={PRELOADER_MIN_DISPLAY_MS}
             initial={false}
             animate={{ opacity: preloaderExiting ? 0 : 1 }}
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
@@ -257,14 +298,18 @@ export function HeroScroll() {
               >
                 Feb 14, 2026 &nbsp;•&nbsp; 90 Minutes &nbsp;•&nbsp; Live + Q&A &nbsp;•&nbsp; ₹499 (Incl. GST)
               </motion.p>
-              <motion.div style={{ opacity: scrollButtonOpacity }} className="mt-8">
+              <div ref={scrollButtonRef} className="mt-8" style={{ opacity: 1 }}>
                 <a
                   href="#details"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    scrollTo("#details", { duration: 1.2 });
+                  }}
                   className="font-inter font-normal text-[15px] text-white/95 bg-white/20 backdrop-blur-sm px-6 py-3 rounded-full min-h-[48px] inline-flex items-center justify-center hover:bg-white/30 transition-colors duration-300"
                 >
                   Scroll to know more
                 </a>
-              </motion.div>
+              </div>
               <motion.div
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
