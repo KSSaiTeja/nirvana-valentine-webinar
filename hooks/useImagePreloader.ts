@@ -116,10 +116,7 @@ export function useImagePreloader() {
       imagesRef.current = imagesByIndex;
       setProgressThrottled(loadedCount, n);
 
-      const firstChunkReady = imagesByIndex
-        .slice(0, MIN_FRAMES_TO_START)
-        .every((el) => el != null);
-      if (firstChunkReady) setIsReady(true);
+      if (imagesByIndex[0] != null) setIsReady(true);
       if (loadedCount === n) setIsReady(true);
     };
 

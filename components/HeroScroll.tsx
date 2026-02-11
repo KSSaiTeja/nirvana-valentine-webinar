@@ -1,7 +1,6 @@
 "use client";
 
-import { useRef, useEffect, useCallback, useState } from "react";
-import Image from "next/image";
+import { useRef, useEffect, useCallback } from "react";
 import { useImagePreloader } from "@/hooks/useImagePreloader";
 import { useLenisScroll } from "@/contexts/LenisScrollContext";
 import { useRegistrationModal } from "@/contexts/RegistrationModalContext";
@@ -10,8 +9,6 @@ import { motion } from "framer-motion";
 const HERO_HEIGHT_VH = 120;
 const FRAME_LERP = 0.12;
 const HERO_EASE = [0.22, 1, 0.36, 1] as const;
-/** Minimum time (ms) the preloader is visible before fade-out. */
-const PRELOADER_MIN_DISPLAY_MS = 1400;
 
 function BlurRevealText({
   text,
@@ -59,36 +56,20 @@ export function HeroScroll() {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const scrollButtonRef = useRef<HTMLDivElement>(null);
-  const {
-    imagesRef,
-    maxLoadedIndexRef,
-    isReady,
-    totalFrames,
-    error,
-  } = useImagePreloader();
+  const { imagesRef, maxLoadedIndexRef, isReady, totalFrames, error } =
+    useImagePreloader();
   const { scrollYRef, scrollTo } = useLenisScroll();
   const { openModal } = useRegistrationModal();
   const currentFrameRef = useRef(0);
   const targetFrameRef = useRef(0);
-  const [preloaderExiting, setPreloaderExiting] = useState(false);
-  const preloaderShownAtRef = useRef<number | null>(null);
-
-  useEffect(() => {
-    if (preloaderShownAtRef.current === null) preloaderShownAtRef.current = Date.now();
-  }, []);
-
-  useEffect(() => {
-    if (!isReady || preloaderExiting) return;
-    const elapsed = preloaderShownAtRef.current
-      ? Date.now() - preloaderShownAtRef.current
-      : 0;
-    const delay = Math.max(0, PRELOADER_MIN_DISPLAY_MS - elapsed);
-    const t = setTimeout(() => setPreloaderExiting(true), delay);
-    return () => clearTimeout(t);
-  }, [isReady, preloaderExiting]);
+  const lastDrawnFrameRef = useRef<number>(-1);
 
   const draw = useCallback(
-    (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, index: number) => {
+    (
+      ctx: CanvasRenderingContext2D,
+      canvas: HTMLCanvasElement,
+      index: number,
+    ) => {
       const maxLoaded = maxLoadedIndexRef.current;
       const imgs = imagesRef.current;
       const safeIndex =
@@ -97,7 +78,7 @@ export function HeroScroll() {
       if (!img) return;
       const scale = Math.max(
         canvas.width / img.width,
-        canvas.height / img.height
+        canvas.height / img.height,
       );
       const w = img.width * scale;
       const h = img.height * scale;
@@ -107,7 +88,7 @@ export function HeroScroll() {
     },
     // Refs are stable; we read .current inside to avoid re-running canvas effect on every frame load.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [],
   );
 
   useEffect(() => {
@@ -126,7 +107,10 @@ export function HeroScroll() {
       sectionLayoutRef.top = container.offsetTop;
       sectionLayoutRef.height = container.offsetHeight;
       const viewportHeight = window.innerHeight;
-      sectionLayoutRef.maxScroll = Math.max(0, sectionLayoutRef.height - viewportHeight);
+      sectionLayoutRef.maxScroll = Math.max(
+        0,
+        sectionLayoutRef.height - viewportHeight,
+      );
     };
 
     const setSize = () => {
@@ -139,7 +123,9 @@ export function HeroScroll() {
       canvas.style.width = `${width}px`;
       canvas.style.height = `${height}px`;
       updateSectionLayout();
-      draw(ctx, canvas, Math.round(currentFrameRef.current));
+      const frame = Math.round(currentFrameRef.current);
+      draw(ctx, canvas, frame);
+      lastDrawnFrameRef.current = frame;
     };
 
     setSize();
@@ -157,7 +143,7 @@ export function HeroScroll() {
           : Math.max(0, Math.min(1, (scrollY - sectionTop) / maxScroll));
       targetFrameRef.current = Math.min(
         Math.floor(scrollProgress * totalFrames),
-        totalFrames - 1
+        totalFrames - 1,
       );
 
       const target = targetFrameRef.current;
@@ -165,10 +151,16 @@ export function HeroScroll() {
       current += (target - current) * FRAME_LERP;
       if (Math.abs(target - current) < 0.5) current = target;
       currentFrameRef.current = current;
-      draw(ctx, canvas, Math.round(current));
+      const frameToDraw = Math.round(current);
+      if (frameToDraw !== lastDrawnFrameRef.current) {
+        lastDrawnFrameRef.current = frameToDraw;
+        draw(ctx, canvas, frameToDraw);
+      }
 
       if (scrollButtonEl) {
-        scrollButtonEl.style.opacity = String(scrollProgressToButtonOpacity(scrollProgress));
+        scrollButtonEl.style.opacity = String(
+          scrollProgressToButtonOpacity(scrollProgress),
+        );
       }
     };
 
@@ -182,7 +174,7 @@ export function HeroScroll() {
           update();
         }
       },
-      { root: null, rootMargin: "0px", threshold: 0 }
+      { root: null, rootMargin: "0px", threshold: 0 },
     );
     io.observe(container);
 
@@ -211,7 +203,7 @@ export function HeroScroll() {
       data-hero-section="true"
       data-frame-count={isReady ? totalFrames : undefined}
     >
-      <div className="sticky top-0 left-0 w-full h-dvh min-h-dvh max-h-dvh flex items-center justify-center overflow-hidden">
+      <div className="sticky top-0 left-0 w-full h-dvh min-h-dvh max-h-dvh flex items-center justify-center overflow-hidden bg-black">
         <canvas
           ref={canvasRef}
           className="absolute inset-0 w-full h-full object-cover will-change-transform"
@@ -226,7 +218,7 @@ export function HeroScroll() {
         {/* Smooth fade at bottom of last frame into next section */}
         {isReady && (
           <div
-            className="absolute inset-x-0 bottom-0 h-[45%] pointer-events-none"
+            className="absolute inset-x-0 bottom-0 h-[45%] pointer-events-none z-[1]"
             style={{
               background:
                 "linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0.92) 85%, white 100%)",
@@ -234,39 +226,13 @@ export function HeroScroll() {
           />
         )}
         {error && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-            <p className="font-inter font-medium text-red-400 text-sm tracking-wide text-center px-4">{error}</p>
+          <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm z-[2]">
+            <p className="font-inter font-medium text-red-400 text-sm tracking-wide text-center px-4">
+              {error}
+            </p>
           </div>
         )}
-        {(!isReady || preloaderExiting) && !error && (
-          <motion.div
-            className="absolute inset-0 flex flex-col items-center justify-center bg-black"
-            role="status"
-            aria-live="polite"
-            aria-busy={!isReady}
-            aria-label="Loading"
-            data-testid="preloader"
-            data-preloader-min-ms={PRELOADER_MIN_DISPLAY_MS}
-            initial={false}
-            animate={{ opacity: preloaderExiting ? 0 : 1 }}
-            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-            onAnimationComplete={() => {
-              if (preloaderExiting) setPreloaderExiting(false);
-            }}
-          >
-            <Image
-              src="/Logo.svg"
-              alt=""
-              width={160}
-              height={64}
-              className="h-12 w-auto sm:h-14 md:h-16 select-none"
-              priority
-              draggable={false}
-            />
-          </motion.div>
-        )}
-        {isReady && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center min-h-dvh px-4 sm:px-6 md:px-8">
+        <div className="absolute inset-0 flex flex-col items-center justify-center min-h-dvh px-4 sm:px-6 md:px-8 z-[1]">
             <div className="w-full max-w-[760px] mx-auto text-center">
               <h1 className="font-playfair text-white text-[clamp(2.75rem,6.5vw,64px)] font-semibold tracking-[-0.025em] leading-[1.35]">
                 <BlurRevealText
@@ -296,9 +262,14 @@ export function HeroScroll() {
                 transition={{ duration: 0.7, delay: 0.8, ease: HERO_EASE }}
                 className="font-inter text-white text-[13px] sm:text-[14px] font-semibold uppercase tracking-[0.08em] mt-6"
               >
-                Feb 14, 2026 &nbsp;•&nbsp; 90 Minutes &nbsp;•&nbsp; Live + Q&A &nbsp;•&nbsp; ₹499 (Incl. GST)
+                Feb 14, 2026 &nbsp;•&nbsp; 90 Minutes &nbsp;•&nbsp; Live Webinar
+                on Decoding the Markets
               </motion.p>
-              <div ref={scrollButtonRef} className="mt-8" style={{ opacity: 1 }}>
+              <div
+                ref={scrollButtonRef}
+                className="mt-8"
+                style={{ opacity: 1 }}
+              >
                 <a
                   href="#details"
                   onClick={(e) => {
@@ -326,7 +297,6 @@ export function HeroScroll() {
               </motion.div>
             </div>
           </div>
-        )}
       </div>
     </div>
   );
