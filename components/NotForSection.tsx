@@ -126,7 +126,7 @@ export function NotForSection() {
             onClick={openModal}
             className="font-inter font-semibold text-white px-8 py-4 rounded-full min-h-[52px] inline-flex items-center justify-center transition-transform duration-300 ease-out hover:-translate-y-[2px] bg-neutral-900"
           >
-            Reserve my seat.
+            Reserve my seat
           </button>
         </motion.div>
       </div>

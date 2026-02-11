@@ -122,7 +122,7 @@ export function WebinarDetailsSection() {
             onClick={openModal}
             className="mt-6 sm:mt-8 font-inter font-semibold text-white px-8 py-4 rounded-full min-h-[52px] inline-flex items-center justify-center transition-transform duration-300 ease-out hover:-translate-y-[2px] bg-neutral-900 w-full sm:w-auto"
           >
-            Reserve my seat.
+            Reserve my seat
           </button>
           <p className="font-inter text-neutral-500 text-sm sm:text-base mt-5 max-w-sm mx-auto leading-relaxed">
             Valentine&apos;s Day is once a year. Secure your spot before seats

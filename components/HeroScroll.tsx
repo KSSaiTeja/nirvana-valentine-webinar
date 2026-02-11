@@ -321,7 +321,7 @@ export function HeroScroll() {
                   onClick={openModal}
                   className="font-inter font-semibold text-white bg-[#111] px-7 py-4 rounded-full min-h-[48px] inline-flex items-center justify-center hover:-translate-y-[2px] transition-transform duration-300 ease-out"
                 >
-                  Reserve my seat.
+                  Reserve my seat
                 </button>
               </motion.div>
             </div>

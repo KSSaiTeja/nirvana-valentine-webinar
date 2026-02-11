@@ -28,7 +28,7 @@ export default function Header() {
           onClick={openModal}
           className="font-inter font-semibold text-white px-6 py-3 sm:px-8 sm:py-4 rounded-full min-h-[44px] sm:min-h-[52px] inline-flex items-center justify-center transition-transform duration-300 ease-out hover:-translate-y-[2px] bg-neutral-900 text-sm sm:text-base shrink-0"
         >
-          Reserve my seat.
+          Reserve my seat
         </button>
       </div>
     </header>

@@ -16,7 +16,8 @@ type RegistrationModalContextValue = {
   closeModal: () => void;
 };
 
-const RegistrationModalContext = createContext<RegistrationModalContextValue | null>(null);
+const RegistrationModalContext =
+  createContext<RegistrationModalContextValue | null>(null);
 
 const PAYMENT_URL =
   process.env.NEXT_PUBLIC_RAZORPAY_PAYMENT_URL ?? "https://rzp.io/rzp/RIB4o7Ao";
@@ -25,18 +26,27 @@ const PAYMENT_URL =
 function isValidIndianPhone(value: string): boolean {
   const digits = value.replace(/\D/g, "");
   if (digits.length === 10) return /^[6-9]\d{9}$/.test(digits);
-  if (digits.length === 11 && digits.startsWith("0")) return /^0[6-9]\d{9}$/.test(digits);
-  if (digits.length === 12 && digits.startsWith("91")) return /^91[6-9]\d{9}$/.test(digits);
+  if (digits.length === 11 && digits.startsWith("0"))
+    return /^0[6-9]\d{9}$/.test(digits);
+  if (digits.length === 12 && digits.startsWith("91"))
+    return /^91[6-9]\d{9}$/.test(digits);
   return false;
 }
 
 export function useRegistrationModal() {
   const ctx = useContext(RegistrationModalContext);
-  if (!ctx) throw new Error("useRegistrationModal must be used within RegistrationModalProvider");
+  if (!ctx)
+    throw new Error(
+      "useRegistrationModal must be used within RegistrationModalProvider",
+    );
   return ctx;
 }
 
-export function RegistrationModalProvider({ children }: { children: ReactNode }) {
+export function RegistrationModalProvider({
+  children,
+}: {
+  children: ReactNode;
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -127,7 +137,7 @@ export function RegistrationModalProvider({ children }: { children: ReactNode })
             >
               <div className="flex items-center justify-between mb-6">
                 <h2 className="font-playfair text-xl font-semibold text-neutral-900 sm:text-2xl">
-                  {showThankYou ? "Thank you!" : "Reserve my seat."}
+                  {showThankYou ? "Thank you!" : "Reserve my seat"}
                 </h2>
                 {!showThankYou && (
                   <button
@@ -147,7 +157,10 @@ export function RegistrationModalProvider({ children }: { children: ReactNode })
                   animate={{ opacity: 1, y: 0 }}
                   className="py-4 text-center"
                 >
-                  <CheckCircle className="mx-auto w-14 h-14 text-green-500 mb-4" strokeWidth={1.5} />
+                  <CheckCircle
+                    className="mx-auto w-14 h-14 text-green-500 mb-4"
+                    strokeWidth={1.5}
+                  />
                   <p className="font-inter text-neutral-700 text-base mb-1">
                     Your details have been saved.
                   </p>
@@ -162,74 +175,74 @@ export function RegistrationModalProvider({ children }: { children: ReactNode })
                   </p>
 
                   <form onSubmit={handleSubmit} className="space-y-4">
-                {submitError && (
-                  <p className="font-inter text-sm text-red-600 bg-red-50 rounded-xl px-4 py-2">
-                    {submitError}
-                  </p>
-                )}
-                <div>
-                  <label
-                    htmlFor="reg-name"
-                    className="font-inter mb-1.5 block text-sm font-medium text-neutral-700"
-                  >
-                    Name <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    id="reg-name"
-                    name="name"
-                    type="text"
-                    required
-                    autoComplete="name"
-                    className="font-inter w-full rounded-xl border border-neutral-200 bg-white px-4 py-3 text-neutral-900 placeholder:text-neutral-400 focus:border-neutral-400 focus:outline-none focus:ring-1 focus:ring-neutral-400"
-                    placeholder="Your name"
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="reg-phone"
-                    className="font-inter mb-1.5 block text-sm font-medium text-neutral-700"
-                  >
-                    Phone number <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    id="reg-phone"
-                    name="phone"
-                    type="tel"
-                    required
-                    autoComplete="tel"
-                    minLength={10}
-                    maxLength={14}
-                    pattern="[0-9+\s\-]{10,14}"
-                    title="Enter a valid 10-digit Indian mobile number (e.g. 9876543210)"
-                    className="font-inter w-full rounded-xl border border-neutral-200 bg-white px-4 py-3 text-neutral-900 placeholder:text-neutral-400 focus:border-neutral-400 focus:outline-none focus:ring-1 focus:ring-neutral-400"
-                    placeholder="e.g. 9876543210"
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="reg-email"
-                    className="font-inter mb-1.5 block text-sm font-medium text-neutral-700"
-                  >
-                    Email <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    id="reg-email"
-                    name="email"
-                    type="email"
-                    required
-                    autoComplete="email"
-                    className="font-inter w-full rounded-xl border border-neutral-200 bg-white px-4 py-3 text-neutral-900 placeholder:text-neutral-400 focus:border-neutral-400 focus:outline-none focus:ring-1 focus:ring-neutral-400"
-                    placeholder="you@example.com"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="font-inter mt-2 w-full font-semibold text-white rounded-full bg-neutral-900 py-4 transition-transform hover:-translate-y-[2px] disabled:opacity-60 disabled:pointer-events-none"
-                >
-                  {isSubmitting ? "Saving…" : "Continue to payment — ₹499"}
-                </button>
-              </form>
+                    {submitError && (
+                      <p className="font-inter text-sm text-red-600 bg-red-50 rounded-xl px-4 py-2">
+                        {submitError}
+                      </p>
+                    )}
+                    <div>
+                      <label
+                        htmlFor="reg-name"
+                        className="font-inter mb-1.5 block text-sm font-medium text-neutral-700"
+                      >
+                        Name <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        id="reg-name"
+                        name="name"
+                        type="text"
+                        required
+                        autoComplete="name"
+                        className="font-inter w-full rounded-xl border border-neutral-200 bg-white px-4 py-3 text-neutral-900 placeholder:text-neutral-400 focus:border-neutral-400 focus:outline-none focus:ring-1 focus:ring-neutral-400"
+                        placeholder="Your name"
+                      />
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="reg-phone"
+                        className="font-inter mb-1.5 block text-sm font-medium text-neutral-700"
+                      >
+                        Phone number <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        id="reg-phone"
+                        name="phone"
+                        type="tel"
+                        required
+                        autoComplete="tel"
+                        minLength={10}
+                        maxLength={14}
+                        pattern="[0-9+\s\-]{10,14}"
+                        title="Enter a valid 10-digit Indian mobile number (e.g. 9876543210)"
+                        className="font-inter w-full rounded-xl border border-neutral-200 bg-white px-4 py-3 text-neutral-900 placeholder:text-neutral-400 focus:border-neutral-400 focus:outline-none focus:ring-1 focus:ring-neutral-400"
+                        placeholder="e.g. 9876543210"
+                      />
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="reg-email"
+                        className="font-inter mb-1.5 block text-sm font-medium text-neutral-700"
+                      >
+                        Email <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        id="reg-email"
+                        name="email"
+                        type="email"
+                        required
+                        autoComplete="email"
+                        className="font-inter w-full rounded-xl border border-neutral-200 bg-white px-4 py-3 text-neutral-900 placeholder:text-neutral-400 focus:border-neutral-400 focus:outline-none focus:ring-1 focus:ring-neutral-400"
+                        placeholder="you@example.com"
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="font-inter mt-2 w-full font-semibold text-white rounded-full bg-neutral-900 py-4 transition-transform hover:-translate-y-[2px] disabled:opacity-60 disabled:pointer-events-none"
+                    >
+                      {isSubmitting ? "Saving…" : "Continue to payment"}
+                    </button>
+                  </form>
                 </>
               )}
             </motion.dialog>
