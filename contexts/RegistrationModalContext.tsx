@@ -171,7 +171,8 @@ export function RegistrationModalProvider({
               ) : (
                 <>
                   <p className="font-inter text-sm text-neutral-500 mb-6">
-                    Feb 14, 2026 · 90 mins live + Q&A · ₹499 (GST included)
+                    We&apos;ll share the webinar access details on your
+                    registered email.
                   </p>
 
                   <form onSubmit={handleSubmit} className="space-y-4">

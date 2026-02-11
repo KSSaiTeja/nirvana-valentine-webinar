@@ -15,7 +15,7 @@ const DETAILS = [
     icon: Calendar,
     label: "Date",
     value: "Saturday, February 14, 2026",
-    sub: "10:30am – 12:30pm",
+    sub: "10:30am – 12:00pm",
   },
   {
     icon: Clock,
